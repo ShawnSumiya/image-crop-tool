@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
 
-export default function ImageDropZone({ onFilesSelected, isProUser }) {
+export default function ImageDropZone({ onFilesSelected, isProUser, onProUnlock }) {
   const [isDragging, setIsDragging] = useState(false);
 
   const handleDragOver = useCallback((e) => {
@@ -99,7 +99,15 @@ export default function ImageDropZone({ onFilesSelected, isProUser }) {
             </p>
             {!isProUser && (
               <p className="text-xs text-amber-600 mt-1">
-                無料版では一度に2枚まで選択できます。🔓 Pro版で制限解除
+                無料版では一度に2枚まで選択できます。
+                <button
+                  type="button"
+                  onClick={() => onProUnlock && onProUnlock()}
+                  className="ml-1 underline font-semibold"
+                >
+                  🔓 Pro版
+                </button>
+                で制限解除
               </p>
             )}
           </div>

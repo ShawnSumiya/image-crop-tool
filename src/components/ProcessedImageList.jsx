@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import JSZip from 'jszip';
 
-export default function ProcessedImageList({ processedImages, onRemove, isProUser }) {
+export default function ProcessedImageList({ processedImages, onRemove, isProUser, onProUnlock }) {
   const [imageUrls, setImageUrls] = useState({});
 
   // 画像URLの生成とクリーンアップ
@@ -75,7 +75,14 @@ export default function ProcessedImageList({ processedImages, onRemove, isProUse
           </button>
           {!isProUser && (
             <span className="text-xs text-gray-500">
-              🔓 Pro版で一括ダウンロード（ZIP）が利用できます
+              <button
+                type="button"
+                onClick={() => onProUnlock && onProUnlock()}
+                className="underline font-semibold mr-1"
+              >
+                🔓 Pro版
+              </button>
+              で一括ダウンロード（ZIP）が利用できます
             </span>
           )}
         </div>

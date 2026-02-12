@@ -8,7 +8,7 @@ function App() {
   const [processing, setProcessing] = useState(false);
   const [processingCount, setProcessingCount] = useState(0);
   const [threshold, setThreshold] = useState(240);
-   const [isProUser, setIsProUser] = useState(false);
+  const [isProUser, setIsProUser] = useState(false);
 
   // Pro版認証ロジック
   useEffect(() => {
@@ -48,6 +48,31 @@ function App() {
       }
     } catch (error) {
       console.error('Pro 認証処理でエラーが発生しました:', error);
+    }
+  }, []);
+
+  // 手動で Pro キーを入力して認証する処理
+  const handleProUnlock = useCallback(() => {
+    try {
+      if (typeof window === 'undefined') return;
+
+      const input = window.prompt(
+        'Pro版アクセスキーを入力してください。\n（例）v-studio-access-2025'
+      );
+
+      if (!input) {
+        return;
+      }
+
+      if (input === 'v-studio-access-2025') {
+        setIsProUser(true);
+        window.localStorage.setItem('isProUser', 'true');
+        window.alert('Pro版が有効になりました。ありがとうございます！');
+      } else {
+        window.alert('無効なキーです。入力内容をご確認ください。');
+      }
+    } catch (error) {
+      console.error('Pro キー入力処理でエラーが発生しました:', error);
     }
   }, []);
 
@@ -128,6 +153,7 @@ function App() {
           <ImageDropZone
             onFilesSelected={handleFilesSelected}
             isProUser={isProUser}
+            onProUnlock={handleProUnlock}
           />
 
           {processing && (
@@ -165,6 +191,7 @@ function App() {
           processedImages={processedImages}
           onRemove={handleRemoveImage}
           isProUser={isProUser}
+          onProUnlock={handleProUnlock}
         />
       </div>
     </div>
