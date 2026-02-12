@@ -27,7 +27,7 @@ function App() {
       const authToken = params.get('auth');
       let shouldUpdateUrl = false;
 
-      if (authToken === 'v-studio-access-2025') {
+      if (authToken === 'CROP-STD-2026-A1') {
         setIsProUser(true);
         window.localStorage.setItem('isProUser', 'true');
         params.delete('auth');
@@ -57,14 +57,14 @@ function App() {
       if (typeof window === 'undefined') return;
 
       const input = window.prompt(
-        'Pro版アクセスキーを入力してください。\n（例）v-studio-access-2025'
+        'Pro版アクセスキーを入力してください。\n（例）CROP-STD-2026-A1'
       );
 
       if (!input) {
         return;
       }
 
-      if (input === 'v-studio-access-2025') {
+      if (input === 'CROP-STD-2026-A1') {
         setIsProUser(true);
         window.localStorage.setItem('isProUser', 'true');
         window.alert('Pro版が有効になりました。ありがとうございます！');
