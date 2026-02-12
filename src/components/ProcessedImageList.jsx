@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import JSZip from 'jszip';
 
-export default function ProcessedImageList({ processedImages, onRemove }) {
+export default function ProcessedImageList({ processedImages, onRemove, isProUser }) {
   const [imageUrls, setImageUrls] = useState({});
 
   // 画像URLの生成とクリーンアップ
@@ -61,12 +61,24 @@ export default function ProcessedImageList({ processedImages, onRemove }) {
         <h2 className="text-xl font-semibold text-gray-800">
           処理済み画像 ({processedImages.length}枚)
         </h2>
-        <button
-          onClick={handleDownloadAll}
-          className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium"
-        >
-          すべてダウンロード (ZIP)
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={handleDownloadAll}
+            disabled={!isProUser || processedImages.length === 0}
+            className={`px-4 py-2 rounded-lg transition-colors font-medium ${
+              !isProUser
+                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                : 'bg-green-600 text-white hover:bg-green-700'
+            }`}
+          >
+            すべてダウンロード (ZIP)
+          </button>
+          {!isProUser && (
+            <span className="text-xs text-gray-500">
+              🔓 Pro版で一括ダウンロード（ZIP）が利用できます
+            </span>
+          )}
+        </div>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {processedImages.map((image, index) => (

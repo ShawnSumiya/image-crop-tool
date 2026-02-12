@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import ImageDropZone from './components/ImageDropZone';
 import ProcessedImageList from './components/ProcessedImageList';
 import { cropImageMargins } from './utils/imageCrop';
@@ -8,6 +8,48 @@ function App() {
   const [processing, setProcessing] = useState(false);
   const [processingCount, setProcessingCount] = useState(0);
   const [threshold, setThreshold] = useState(240);
+   const [isProUser, setIsProUser] = useState(false);
+
+  // Pro版認証ロジック
+  useEffect(() => {
+    try {
+      if (typeof window === 'undefined') return;
+
+      // localStorage に保存された Pro 情報を確認
+      const stored = window.localStorage.getItem('isProUser');
+      if (stored === 'true') {
+        setIsProUser(true);
+      }
+
+      // URL クエリパラメータから認証トークンを確認
+      const url = new URL(window.location.href);
+      const params = url.searchParams;
+      const authToken = params.get('auth');
+      let shouldUpdateUrl = false;
+
+      if (authToken === 'v-studio-access-2025') {
+        setIsProUser(true);
+        window.localStorage.setItem('isProUser', 'true');
+        params.delete('auth');
+        shouldUpdateUrl = true;
+      } else if (authToken) {
+        // 不正なトークンが含まれている場合も URL からは取り除く
+        params.delete('auth');
+        shouldUpdateUrl = true;
+      }
+
+      if (shouldUpdateUrl) {
+        const searchString = params.toString();
+        const newUrl =
+          url.pathname +
+          (searchString ? `?${searchString}` : '') +
+          url.hash;
+        window.history.replaceState(window.history.state, document.title, newUrl);
+      }
+    } catch (error) {
+      console.error('Pro 認証処理でエラーが発生しました:', error);
+    }
+  }, []);
 
   const handleFilesSelected = useCallback(async (files) => {
     setProcessing(true);
@@ -44,9 +86,18 @@ function App() {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8 px-4">
       <div className="max-w-7xl mx-auto">
         <header className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-800 mb-2">
-            画像余白自動クロップツール
-          </h1>
+          <div className="flex flex-col items-center gap-2">
+            <div className="flex items-center gap-3">
+              <h1 className="text-4xl font-bold text-gray-800">
+                画像余白自動クロップツール
+              </h1>
+              {isProUser && (
+                <span className="inline-flex items-center rounded-full bg-purple-100 px-3 py-1 text-xs font-semibold text-purple-700 border border-purple-200">
+                  Pro Plan
+                </span>
+              )}
+            </div>
+          </div>
           <p className="text-gray-600">
             画像の周囲の透明または白い余白を自動で検出して切り取ります
           </p>
@@ -74,7 +125,10 @@ function App() {
             </p>
           </div>
 
-          <ImageDropZone onFilesSelected={handleFilesSelected} />
+          <ImageDropZone
+            onFilesSelected={handleFilesSelected}
+            isProUser={isProUser}
+          />
 
           {processing && (
             <div className="mt-6 text-center">
@@ -110,6 +164,7 @@ function App() {
         <ProcessedImageList
           processedImages={processedImages}
           onRemove={handleRemoveImage}
+          isProUser={isProUser}
         />
       </div>
     </div>

@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
 
-export default function ImageDropZone({ onFilesSelected }) {
+export default function ImageDropZone({ onFilesSelected, isProUser }) {
   const [isDragging, setIsDragging] = useState(false);
 
   const handleDragOver = useCallback((e) => {
@@ -20,24 +20,38 @@ export default function ImageDropZone({ onFilesSelected }) {
     e.stopPropagation();
     setIsDragging(false);
 
-    const files = Array.from(e.dataTransfer.files).filter(file =>
+    const files = Array.from(e.dataTransfer.files).filter((file) =>
       file.type.startsWith('image/')
     );
+
+    if (!isProUser && files.length >= 3) {
+      window.alert(
+        '無料版では一度に選択できる画像は2枚までです。\nPro版で制限を解除できます。'
+      );
+      return;
+    }
 
     if (files.length > 0) {
       onFilesSelected(files);
     }
-  }, [onFilesSelected]);
+  }, [onFilesSelected, isProUser]);
 
   const handleFileInput = useCallback((e) => {
-    const files = Array.from(e.target.files).filter(file =>
+    const files = Array.from(e.target.files).filter((file) =>
       file.type.startsWith('image/')
     );
+
+    if (!isProUser && files.length >= 3) {
+      window.alert(
+        '無料版では一度に選択できる画像は2枚までです。\nPro版で制限を解除できます。'
+      );
+      return;
+    }
 
     if (files.length > 0) {
       onFilesSelected(files);
     }
-  }, [onFilesSelected]);
+  }, [onFilesSelected, isProUser]);
 
   return (
     <div
@@ -83,6 +97,11 @@ export default function ImageDropZone({ onFilesSelected }) {
             <p className="text-xs text-gray-400 mt-1">
               複数画像の同時選択が可能です
             </p>
+            {!isProUser && (
+              <p className="text-xs text-amber-600 mt-1">
+                無料版では一度に2枚まで選択できます。🔓 Pro版で制限解除
+              </p>
+            )}
           </div>
         </div>
       </label>
